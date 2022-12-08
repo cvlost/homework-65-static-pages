@@ -1,18 +1,19 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {useParams} from "react-router-dom";
-import {PageApi} from "../../types";
+import {Page} from "../../types";
 import axiosApi from "../../axiosApi";
 import Spinner from "../Spinner/Spinner";
+import FroalaEditorView from "react-froala-wysiwyg/FroalaEditorView";
 
 const PageView = () => {
-  const [page, setPage] = useState<PageApi | null>(null);
+  const [page, setPage] = useState<Page | null>(null);
   const [loading, setLoading] = useState(false);
   const {pageName} = useParams();
 
   const fetchPage = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await axiosApi.get<PageApi>(`/pages/${pageName}.json`);
+      const response = await axiosApi.get<Page>(`/pages/${pageName}.json`);
       const pageData = response.data;
 
       if (pageData) {
@@ -34,7 +35,7 @@ const PageView = () => {
   else if (page) output = (
     <article>
       <h3>{page.title}</h3>
-      <p>{page.content}</p>
+      <FroalaEditorView model={page.content}/>
     </article>
   );
   else output = (

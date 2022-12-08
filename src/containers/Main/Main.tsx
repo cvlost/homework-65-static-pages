@@ -2,22 +2,22 @@ import React from 'react';
 import Sidebar from "../../components/Sidebar/Sidebar";
 import {Outlet, useOutlet} from "react-router-dom";
 import Spinner from "../../components/Spinner/Spinner";
-import {SidebarEntity} from "../../types";
+import {PageBrief} from "../../types";
 
 interface Props {
   loading: boolean;
-  sidebarData: SidebarEntity[];
+  pagesBrief: PageBrief[];
 }
 
-const Main: React.FC<Props> = ({loading, sidebarData}) => {
+const Main: React.FC<Props> = ({loading, pagesBrief}) => {
   const outlet = useOutlet();
   let output: React.ReactNode;
 
   if (loading) output = <Spinner/>;
   else if (outlet) output = outlet;
-  else if (sidebarData.length > 0) output = (
+  else if (pagesBrief.length > 0) output = (
     <div className="alert alert-success mt-3 fs-4 text-center">
-      <strong>{`${sidebarData.length}`}</strong> pages are available now!
+      <strong>{`${pagesBrief.length}`}</strong> pages are available now!
     </div>
   );
   else output = (
@@ -28,7 +28,7 @@ const Main: React.FC<Props> = ({loading, sidebarData}) => {
 
   return (
     <>
-      <Sidebar showPreloader={loading} sidebarData={sidebarData}/>
+      <Sidebar showPreloader={loading} sidebarData={pagesBrief}/>
       <div className="container-fluid">
         {output}
       </div>

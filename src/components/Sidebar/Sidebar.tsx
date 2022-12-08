@@ -1,10 +1,10 @@
 import React from 'react';
 import {NavLink} from "react-router-dom";
 import Spinner from "../Spinner/Spinner";
-import {SidebarEntity} from "../../types";
+import {PageBrief} from "../../types";
 
 interface Props {
-  sidebarData: SidebarEntity[];
+  sidebarData: PageBrief[];
   showPreloader: boolean;
 }
 

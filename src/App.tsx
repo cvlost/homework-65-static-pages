@@ -5,12 +5,12 @@ import Main from "./containers/Main/Main";
 import PageView from "./components/PageView/PageView";
 import PageForm from "./components/PageForm/PageForm";
 import axiosApi from "./axiosApi";
-import {PageApi, PageList, SidebarEntity} from "./types";
+import {Page, PageList, PageBrief} from "./types";
 
 function App() {
   const [loading, setLoading] = useState(false);
-  const [pages, setPages] = useState<PageApi[] | null>([]);
-  const sidebarData = useRef<SidebarEntity[]>([]);
+  const [pages, setPages] = useState<Page[] | null>([]);
+  const pagesBrief = useRef<PageBrief[]>([]);
 
   const fetchPages = useCallback(async () => {
     try {
@@ -23,7 +23,7 @@ function App() {
         return;
       }
 
-      const newSidebarData: SidebarEntity[] = [];
+      const newSidebarData: PageBrief[] = [];
 
       const newPages = Object.keys(pagesData).map((pageId) => {
         const page = pagesData[pageId];
@@ -34,7 +34,7 @@ function App() {
         return page;
       });
 
-      sidebarData.current = newSidebarData;
+      pagesBrief.current = newSidebarData;
       setPages(newPages);
 
     } finally {
@@ -57,20 +57,28 @@ function App() {
           <Route path='/' element={(
             <Main
               loading={loading}
-              sidebarData={sidebarData.current}
+              pagesBrief={pagesBrief.current}
             />
           )}>
             <Route path='pages/:pageName' element={(
               <PageView/>
             )}/>
-            <Route path='pages/admin' element={(
-              <PageForm/>
+            <Route path='pages/admin/edit' element={(
+              <PageForm pagesBrief={pagesBrief.current} edit reload={fetchPages}/>
+            )}/>
+            <Route path='pages/admin/create' element={(
+              <PageForm pagesBrief={pagesBrief.current} reload={fetchPages}/>
+            )}/>
+            <Route path='*' element={(
+              <div className="alert alert-secondary text-center mt-3 fs-4">Not Found</div>
             )}/>
           </Route>
         </Routes>
       </main>
-      <footer className="py-2 text-center text-secondary bg-dark">
-        footer
+      <footer className="py-2 text-end text-secondary bg-dark">
+        <div className="container-fluid">
+          <small>Static Pages - 2022</small>
+        </div>
       </footer>
     </div>
   );
