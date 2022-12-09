@@ -12,7 +12,7 @@ const Sidebar: React.FC<Props> = ({sidebarData, showPreloader}) => {
   let output = <Spinner/>
   if (!showPreloader)
     output = (
-      <ul className="nav nav-pills flex-column mb-auto">
+      <ul className="nav nav-pills d-block overflow-auto mb-auto px-1">
         {sidebarData.map((entity) => (
           <li key={entity.route}>
             <NavLink

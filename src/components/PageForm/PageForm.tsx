@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import 'froala-editor/css/froala_style.min.css';
 import 'froala-editor/css/froala_editor.pkgd.min.css';
 import Editor from 'react-froala-wysiwyg';
@@ -8,6 +8,12 @@ import axiosApi from "../../axiosApi";
 import slug from "slug";
 import {useNavigate} from "react-router-dom";
 import Spinner from "../Spinner/Spinner";
+
+const froalaConfig = {
+  placeholder: 'Page content here...',
+  editorClass: 'shadow-sm',
+  height: 300
+}
 
 interface Props {
   pagesBrief: PageBrief[];
@@ -23,10 +29,33 @@ const initialState: Page = {
 const PageForm: React.FC<Props> = ({pagesBrief, edit = false, reload}) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState<Page>({
-    title: '',
-    content: '',
-  });
+  const [page, setPage] = useState<Page>(initialState);
+  const [selectedPageId, setSelectedPageId] = useState('');
+
+  const getPage = useCallback(async () => {
+    try {
+      const selectedPageIndex = pagesBrief.findIndex((page) => page.route === selectedPageId);
+      setLoading(true);
+      const response = await axiosApi.get<Page>('/pages/' + pagesBrief[selectedPageIndex].route + '.json');
+      setPage(response.data);
+    } finally {
+      setLoading(false);
+    }
+  }, [pagesBrief, selectedPageId]);
+
+  useEffect(() => {
+    console.log(selectedPageId)
+    if (selectedPageId !== '') {
+      void getPage();
+    }
+  }, [getPage, selectedPageId]);
+
+  useEffect(() => {
+    if (!edit) {
+      setPage(initialState);
+      setSelectedPageId('');
+    }
+  }, [edit]);
 
   const createPage = async () => {
     try {
@@ -39,11 +68,26 @@ const PageForm: React.FC<Props> = ({pagesBrief, edit = false, reload}) => {
     }
   };
 
+  const editPage = async () => {
+    try {
+      setLoading(true);
+      if (slug(selectedPageId)) {
+        //
+      }
+
+      await axiosApi.put(`/pages/${slug(page.title)}.json` ,page);
+      reload();
+      navigate(`/pages/${slug(page.title)}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (edit) {
-
+      void editPage();
     } else {
       void createPage();
     }
@@ -57,46 +101,70 @@ const PageForm: React.FC<Props> = ({pagesBrief, edit = false, reload}) => {
     setPage(prev => ({...prev, content}));
   };
 
+  const handleSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedPageId(e.target.value);
+  };
+
   return (
     <Form onSubmit={handleSubmit}>
-      <h4>{edit ? 'Edit Page' : 'Create a New Page'}</h4>
+      <h4 className="mb-3">{edit ? 'Edit Page' : 'Create a New Page'}</h4>
       {edit && (
         <Form.Group className="mb-3">
-          <Form.Label>Disabled select menu</Form.Label>
-          <Form.Select>
-            <option>Disabled select</option>
-          </Form.Select>
-        </Form.Group>
-      )}
-      <fieldset disabled={loading}>
-        <Form.Group className="mb-3 d-flex shadow-sm bg-white sticky-top">
-          <InputGroup className="">
-            <InputGroup.Text id="basic-addon3">
-              Title
+          <InputGroup>
+            <InputGroup.Text>
+              Page
             </InputGroup.Text>
-            <Form.Control
-              placeholder="Page Title..."
-              onChange={handleTitleChange}
-              value={page.title}
-            />
-            <Button
-              type='submit'
-            >Save</Button>
+            <Form.Select value={selectedPageId} onChange={handleSelect} disabled={loading} required>
+              <option value="" disabled>
+                {pagesBrief.length === 0 ? 'No available pages to edit.' : '...'}
+              </option>
+              {pagesBrief.map((page) => (
+                <option
+                  key={page.route}
+                  value={page.route}
+                >{page.title}</option>
+              ))}
+            </Form.Select>
           </InputGroup>
         </Form.Group>
-        <Form.Group className="mb-3">
-          <Form.Label>Page content</Form.Label>
+      )}
+      {(
+        <fieldset disabled={loading}>
+          {edit && selectedPageId === '' ? null : (
+            <Form.Group className="mb-3 d-flex shadow-sm bg-white sticky-top">
+              <InputGroup>
+                <InputGroup.Text>
+                  Title
+                </InputGroup.Text>
+                <Form.Control
+                  placeholder="Page Title..."
+                  onChange={handleTitleChange}
+                  value={page.title}
+                  required
+                />
+                <Button
+                  type='submit'
+                >
+                  {edit ? 'Edit' : 'Create'}
+                </Button>
+              </InputGroup>
+            </Form.Group>
+          )}
           {loading ? (
             <Spinner/>
-          ) : (
-            <Editor
-              tag='textarea'
-              model={page.content}
-              onModelChange={handleContentChange}
-            />
+          ) : edit && selectedPageId === "" ? null : (
+            <Form.Group className="mb-3">
+              <Form.Label>Page content</Form.Label>
+              <Editor
+                tag='textarea'
+                model={page.content}
+                onModelChange={handleContentChange}
+                config={froalaConfig}
+              />
+            </Form.Group>
           )}
-        </Form.Group>
-      </fieldset>
+        </fieldset>
+      )}
     </Form>
   );
 };

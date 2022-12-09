@@ -34,7 +34,7 @@ const PageView = () => {
   if (loading) output = <Spinner/>;
   else if (page) output = (
     <article>
-      <h3>{page.title}</h3>
+      <h3 className="pb-3">{page.title}</h3>
       <FroalaEditorView model={page.content}/>
     </article>
   );

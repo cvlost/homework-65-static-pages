@@ -3,6 +3,7 @@ import Sidebar from "../../components/Sidebar/Sidebar";
 import {Outlet, useOutlet} from "react-router-dom";
 import Spinner from "../../components/Spinner/Spinner";
 import {PageBrief} from "../../types";
+import './Main.css';
 
 interface Props {
   loading: boolean;
@@ -29,7 +30,7 @@ const Main: React.FC<Props> = ({loading, pagesBrief}) => {
   return (
     <>
       <Sidebar showPreloader={loading} sidebarData={pagesBrief}/>
-      <div className="container-fluid">
+      <div className="custom-container">
         {output}
       </div>
     </>
