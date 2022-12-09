@@ -32,6 +32,10 @@ const PageForm: React.FC<Props> = ({pagesBrief, edit = false, reload}) => {
   const [page, setPage] = useState<Page>(initialState);
   const [selectedPageId, setSelectedPageId] = useState('');
 
+  const [newPageId, setNewPageId] = useState('');
+  const [newIdIsValid, setNewIdIsValid] = useState(false);
+  const [validationMessage, setValidationMessage] = useState('ID is Empty');
+
   const getPage = useCallback(async () => {
     try {
       const selectedPageIndex = pagesBrief.findIndex((page) => page.route === selectedPageId);
@@ -53,13 +57,33 @@ const PageForm: React.FC<Props> = ({pagesBrief, edit = false, reload}) => {
     if (!edit) {
       setPage(initialState);
       setSelectedPageId('');
+      setNewPageId('');
+      setValidationMessage('ID is Empty');
+      setNewIdIsValid(false);
     }
   }, [edit]);
+
+  useEffect(() => {
+    const slugID = slug(newPageId, {lower: false});
+    if (newPageId === '') {
+      setNewIdIsValid(false);
+      setValidationMessage('ID is Empty');
+    } else if (slugID !== newPageId) {
+      setNewIdIsValid(false);
+      setValidationMessage('Invalid ID - used forbidden characters');
+    } else if (pagesBrief.some(page => page.route === slugID)) {
+      setNewIdIsValid(false);
+      setValidationMessage('Invalid ID - already taken');
+    } else {
+      setNewIdIsValid(true);
+      setValidationMessage('ID is Valid');
+    }
+  }, [newPageId, pagesBrief]);
 
   const createPage = async () => {
     try {
       setLoading(true);
-      await axiosApi.put(`/pages/${slug(page.title)}.json`, page);
+      await axiosApi.put(`/pages/${slug(newPageId, {lower: false})}.json`, page);
       reload();
       navigate(`/pages/${slug(page.title)}`);
     } finally {
@@ -70,7 +94,7 @@ const PageForm: React.FC<Props> = ({pagesBrief, edit = false, reload}) => {
   const editPage = async () => {
     try {
       setLoading(true);
-      await axiosApi.put(`/pages/${slug(page.title)}.json` ,page);
+      await axiosApi.put(`/pages/${selectedPageId}.json` ,page);
       reload();
       navigate(`/pages/${slug(page.title)}`);
     } finally {
@@ -98,6 +122,10 @@ const PageForm: React.FC<Props> = ({pagesBrief, edit = false, reload}) => {
 
   const handleSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedPageId(e.target.value);
+  };
+
+  const handleIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewPageId(e.target.value);
   };
 
   return (
@@ -139,9 +167,32 @@ const PageForm: React.FC<Props> = ({pagesBrief, edit = false, reload}) => {
                 />
                 <Button
                   type='submit'
+                  disabled={(!edit && !newIdIsValid) || page.title === ''}
                 >
                   {edit ? 'Edit' : 'Create'}
                 </Button>
+              </InputGroup>
+            </Form.Group>
+          )}
+          {!edit && (
+            <Form.Group className="mb-3 shadow-sm">
+              <Form.Text>
+                {newIdIsValid ? (
+                  <span className="text-success">{validationMessage}</span>
+                ) : (
+                  <span className="text-danger">{validationMessage}</span>
+                )}
+              </Form.Text>
+              <InputGroup>
+                <InputGroup.Text>
+                  Page ID
+                </InputGroup.Text>
+                <Form.Control
+                  placeholder="Page Title..."
+                  onChange={handleIdChange}
+                  value={newPageId}
+                  required
+                />
               </InputGroup>
             </Form.Group>
           )}
