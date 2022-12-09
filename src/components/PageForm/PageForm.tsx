@@ -1,6 +1,7 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import 'froala-editor/css/froala_style.min.css';
 import 'froala-editor/css/froala_editor.pkgd.min.css';
+import 'froala-editor/js/plugins.pkgd.min.js'
 import Editor from 'react-froala-wysiwyg';
 import {Page, PageBrief} from "../../types";
 import {Button, Form, InputGroup} from "react-bootstrap";
@@ -8,12 +9,8 @@ import axiosApi from "../../axiosApi";
 import slug from "slug";
 import {useNavigate} from "react-router-dom";
 import Spinner from "../Spinner/Spinner";
+import {froalaConfig} from "./froalaConfig";
 
-const froalaConfig = {
-  placeholder: 'Page content here...',
-  editorClass: 'shadow-sm',
-  height: 300
-}
 
 interface Props {
   pagesBrief: PageBrief[];
@@ -188,7 +185,7 @@ const PageForm: React.FC<Props> = ({pagesBrief, edit = false, reload}) => {
                   Page ID
                 </InputGroup.Text>
                 <Form.Control
-                  placeholder="Page Title..."
+                  placeholder="id..."
                   onChange={handleIdChange}
                   value={newPageId}
                   required
