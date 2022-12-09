@@ -63,11 +63,11 @@ const PageForm: React.FC<Props> = ({pagesBrief, edit = false, reload}) => {
   }, [edit]);
 
   useEffect(() => {
-    const slugID = slug(newPageId, {lower: false});
+    const slugID = slug(newPageId);
     if (newPageId === '') {
       setNewIdIsValid(false);
       setValidationMessage('ID is Empty');
-    } else if (slugID !== newPageId) {
+    } else if (slugID !== newPageId.toLowerCase()) {
       setNewIdIsValid(false);
       setValidationMessage('Invalid ID - used forbidden characters');
     } else if (pagesBrief.some(page => page.route === slugID)) {
@@ -82,7 +82,7 @@ const PageForm: React.FC<Props> = ({pagesBrief, edit = false, reload}) => {
   const createPage = async () => {
     try {
       setLoading(true);
-      await axiosApi.put(`/pages/${slug(newPageId, {lower: false})}.json`, page);
+      await axiosApi.put(`/pages/${slug(newPageId)}.json`, page);
       reload();
       navigate(`/pages/${slug(page.title)}`);
     } finally {
@@ -177,9 +177,9 @@ const PageForm: React.FC<Props> = ({pagesBrief, edit = false, reload}) => {
             <Form.Group className="mb-3 shadow-sm">
               <Form.Text>
                 {newIdIsValid ? (
-                  <span className="text-success">{validationMessage}</span>
+                  <span className="text-success fw-bold">{validationMessage}</span>
                 ) : (
-                  <span className="text-danger">{validationMessage}</span>
+                  <span className="text-danger fw-bold">{validationMessage}</span>
                 )}
               </Form.Text>
               <InputGroup>
