@@ -1,8 +1,4 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import 'froala-editor/css/froala_style.min.css';
-import 'froala-editor/css/froala_editor.pkgd.min.css';
-import 'froala-editor/js/plugins.pkgd.min.js'
-import Editor from 'react-froala-wysiwyg';
 import {Page, PageBrief} from "../../types";
 import {Button, Form, InputGroup} from "react-bootstrap";
 import axiosApi from "../../axiosApi";
@@ -10,6 +6,12 @@ import slug from "slug";
 import {useNavigate} from "react-router-dom";
 import Spinner from "../Spinner/Spinner";
 import {froalaConfig} from "./froalaConfig";
+import 'froala-editor/css/froala_style.min.css';
+import 'froala-editor/css/froala_editor.pkgd.min.css';
+import 'froala-editor/js/plugins.pkgd.min.js';
+import 'font-awesome/css/font-awesome.css';
+import 'froala-editor/js/third_party/font_awesome.min.js';
+import Editor from 'react-froala-wysiwyg';
 
 
 interface Props {
