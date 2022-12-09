@@ -1,6 +1,6 @@
 import React from 'react';
 import Sidebar from "../../components/Sidebar/Sidebar";
-import {Outlet, useOutlet} from "react-router-dom";
+import {useOutlet} from "react-router-dom";
 import Spinner from "../../components/Spinner/Spinner";
 import {PageBrief} from "../../types";
 import './Main.css';

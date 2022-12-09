@@ -1,15 +1,14 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {Route, Routes, useLocation} from "react-router-dom";
+import {Route, Routes} from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar";
 import Main from "./containers/Main/Main";
 import PageView from "./components/PageView/PageView";
 import PageForm from "./components/PageForm/PageForm";
 import axiosApi from "./axiosApi";
-import {Page, PageList, PageBrief} from "./types";
+import {PageBrief, PageList} from "./types";
 
 function App() {
   const [loading, setLoading] = useState(false);
-  const [pages, setPages] = useState<Page[] | null>([]);
   const pagesBrief = useRef<PageBrief[]>([]);
 
   const fetchPages = useCallback(async () => {
@@ -19,13 +18,12 @@ function App() {
       const pagesData = response.data;
 
       if (!pagesData) {
-        setPages([]);
         return;
       }
 
       const newSidebarData: PageBrief[] = [];
 
-      const newPages = Object.keys(pagesData).map((pageId) => {
+      Object.keys(pagesData).map((pageId) => {
         const page = pagesData[pageId];
         newSidebarData.push({
           title: page.title,
@@ -35,7 +33,6 @@ function App() {
       });
 
       pagesBrief.current = newSidebarData;
-      setPages(newPages);
 
     } finally {
       setLoading(false);

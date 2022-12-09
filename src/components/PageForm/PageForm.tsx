@@ -44,7 +44,6 @@ const PageForm: React.FC<Props> = ({pagesBrief, edit = false, reload}) => {
   }, [pagesBrief, selectedPageId]);
 
   useEffect(() => {
-    console.log(selectedPageId)
     if (selectedPageId !== '') {
       void getPage();
     }
@@ -71,10 +70,6 @@ const PageForm: React.FC<Props> = ({pagesBrief, edit = false, reload}) => {
   const editPage = async () => {
     try {
       setLoading(true);
-      if (slug(selectedPageId)) {
-        //
-      }
-
       await axiosApi.put(`/pages/${slug(page.title)}.json` ,page);
       reload();
       navigate(`/pages/${slug(page.title)}`);

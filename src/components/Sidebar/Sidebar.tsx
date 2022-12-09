@@ -32,7 +32,7 @@ const Sidebar: React.FC<Props> = ({sidebarData, showPreloader}) => {
       <span
         className="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none"
       >
-        Available Pages
+        Page List
       </span>
       <hr/>
       {output}
